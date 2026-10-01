@@ -4,84 +4,86 @@
 import random
 import numpy as np
 
-def generar_bosque(n):
+def generate_forest(n):
     return np.zeros(n, dtype = "int16")
 
-def suceso_aleatorio(p):
+def random_event(p):
     return random.random() <= p
 
-def brotes(bosque, p):
-    for i in range(len(bosque)):
-        if suceso_aleatorio(p):
-            bosque[i] = 1
+def sprouts(forest, p):
+    for i in range(len(forest)):
+        if random_event(p):
+            forest[i] = 1
         
-def rayos(bosque, f):
-    for i in range(len(bosque)):
-        if suceso_aleatorio(f) and bosque[i] == 1:
-            bosque[i] = -1
+def lightning(forest, f):
+    for i in range(len(forest)):
+        if random_event(f) and forest[i] == 1:
+            forest[i] = -1
 
-def vecinos(bosque, pos):
+def neighbors(forest, pos):
     if (pos == 0):
-        lista = [1]
-    elif (pos == len(bosque)-1):
-        lista = [len(bosque)-2]
+        list = [1]
+    elif (pos == len(forest)-1):
+        list = [len(forest)-2]
     else:
-        lista = [pos-1, pos+1]
+        list = [pos-1, pos+1]
     
-    return lista
+    return list
 
-def propagar_vecinos(bosque):
-    propague = False
-    for i in range(len(bosque)):
-        if bosque[i] == -1:
-            for j in vecinos(bosque, i):
-                if bosque[j] == 1:
-                    bosque[j] = -1
-                    propague = True
+def propagate_neighbors(forest):
+    propagated = False
+    for i in range(len(forest)):
+        if forest[i] == -1:
+            for j in neighbors(forest, i):
+                if forest[j] == 1:
+                    forest[j] = -1
+                    propagated = True
             
-    return propague
+    return propagated
 
-def propagar(bosque):
-    ya_ta = True
-    while ya_ta == True:
-        ya_ta = propagar_vecinos(bosque)
+def propagate(forest):
+    done = True
+    while done == True:
+        done = propagate_neighbors(forest)
         
-def limpieza(bosque):
-    for i in range(len(bosque)):
-        if bosque[i] == -1:
-            bosque[i] = 0
+def cleaning(forest):
+    for i in range(len(forest)):
+        if forest[i] == -1:
+            forest[i] = 0
             
-def dinamica(n, a, p, f):
-    sobrevivientes = []
-    bosque = generar_bosque(n)
+def dinamic(n, a, p, f):
+    survivors = []
+    forest = generate_forest(n)
     for i in range(a):
-        cuenta = 0
-        brotes(bosque, p)
-        rayos(bosque, f)
-        propagar(bosque)
-        limpieza(bosque)
+        count = 0
+        sprouts(forest, p)
+        lightning(forest, f)
+        propagate(forest)
+        cleaning(forest)
         for i in range(n):
-            if bosque[i] == 1:
-                cuenta += 1
-        sobrevivientes.append(cuenta)
+            if forest[i] == 1:
+                count += 1
+        survivors.append(count)
         
-    return sum(sobrevivientes)/a
+    return sum(survivors)/a
     
-def arboles_sobrevivientes(f, a, n):
-    promedio = []
+def trees_survivors(f, a, n):
+    average = []
     for p in np.arange(0, 1.01, 0.01):
-        promedio.append(dinamica(n, a, p, f))
-    #print(len(promedio))
+        average.append(dinamic(n, a, p, f))
+    #print(len(average))
     
-    return promedio
+    return average
 
-def p_optimo(f, a, n):
-    mayor = 0
-    promedio = arboles_sobrevivientes(f, a, n)
-    for i in range(len(promedio)):
-        if promedio[i] > mayor:
-            mayor = i/100
+def optimal_p(f, a, n):
+    biggest = average[0]
+    place = 0
+    average = trees_survivors(f, a, n)
+    for i in range(len(average)):
+        if average[i] > biggest:
+            biggest = average[i]
+            place = i
     
-    return mayor
+    return f"{place}%"
         
     
